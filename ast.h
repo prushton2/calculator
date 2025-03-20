@@ -20,9 +20,12 @@ typedef struct {
 } Literal;
 
 Token* eat(Token*** tokenPointer);
+Token* getToken(Token*** tokenPointer);
 void* literal(Token*** tokenPointer);
 void* exponent(void* node, Token*** tokenPointer);
 void* term(void* node, Token*** tokenPointer);
 void* expr(void* node, Token*** tokenPointer);
 void* solve(void* node);
 void traverse(void* node);
+
+void printTokenType(TokenType tokentype);

@@ -1,11 +1,10 @@
-OBJFILES = main.o ast.o tokenizer.o
+CFILES = main.c ast.c tokenizer.c
 
-%.o: %.cpp
-	gcc -o $@ $^ -c 
+# %.o: %.cpp
+# 	gcc -o $@ $^ -c -g
 
-all: $(OBJFILES)
-	gcc -o main $(OBJFILES) -lm -g
+all: $(CFILES)
+	gcc -o main $(CFILES) -g -lm
 
 clean:
-	-rm $(OBJFILES)
 	-rm main

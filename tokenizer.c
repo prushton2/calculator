@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+Token* nullToken() {
+    Token* a = (Token*)malloc(sizeof(Token));
+    a->tokenType = EXIT;
+    a->value = 0;
+    return a;
+}
 
 
 Token* parseNextToken(char** inputPointer) {

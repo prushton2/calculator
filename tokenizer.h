@@ -8,7 +8,8 @@ typedef enum {
     EXPONENT, // 4
     LPAREN,   // 5
     RPAREN,   // 6
-    NUMBER    // 7
+    NUMBER,   // 7
+    EXIT,     // 8
 } TokenType;
 
 typedef struct {
@@ -16,4 +17,5 @@ typedef struct {
     int value; //i have both dont @ me
 } Token;
 
+Token* nullToken();
 Token* parseNextToken(char** inputPointer);

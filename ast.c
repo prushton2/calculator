@@ -3,7 +3,38 @@
 #include <stdlib.h>
 #include <math.h>
 
+void printTokenType(TokenType tokentype) {
+    switch(tokentype) {
+        case PLUS:
+            printf("PLUS");
+            break;
+        case MINUS:
+            printf("MINUS");
+            break;
+        case MULTIPLY:
+            printf("MULTIPLY");
+            break;
+        case DIVIDE:
+            printf("DIVIDE");
+            break;
+        case EXPONENT:
+            printf("EXPONENT");
+            break;
+        case LPAREN:
+            printf("LPAREN");
+            break;
+        case RPAREN:
+            printf("RPAREN");
+            break;
+        case NUMBER:
+            printf("NUMBER");
+            break;
+        case EXIT:
+            printf("EXIT");
+            break;
+    }
 
+}
 
 Token* eat(Token*** tokenPointer) {
     Token* currentChar = **tokenPointer;
@@ -11,24 +42,22 @@ Token* eat(Token*** tokenPointer) {
     return currentChar;
 }
 
+Token* getToken(Token*** tokenPointer) {
+    return **tokenPointer;
+}
+
 
 void* literal(Token*** tokenPointer) {
-    printf("literal: %d\n", (**tokenPointer)->tokenType);
-
-    Token* token = **tokenPointer;
-
-    // printf("literal: %c\n", **tokenPointer);
+    Token* token = getToken(tokenPointer);
 
     if(token->tokenType == LPAREN) {
         eat(tokenPointer);
         void* node = NULL;
-        // printf("Entering parentheses\n");
         node = expr(node, tokenPointer);
         
         if((**tokenPointer)->tokenType == RPAREN) {
             eat(tokenPointer);
         }
-        // printf("Leaving parentheses\n");
         return node;
     }
 
@@ -47,12 +76,11 @@ void* literal(Token*** tokenPointer) {
 }
 
 void* exponent(void* node, Token*** tokenPointer) {
-    printf("exponent: %d\n", (**tokenPointer)->tokenType);
-
     node = literal(tokenPointer);
+    Token* token = getToken(tokenPointer);
 
-    while((**tokenPointer)->tokenType == EXPONENT) {
-        Token* token = eat(tokenPointer);
+    while(token->tokenType == EXPONENT) {
+        eat(tokenPointer);
         Op* op = (Op*)malloc(sizeof(Op));
 
         op->left = node;
@@ -60,18 +88,18 @@ void* exponent(void* node, Token*** tokenPointer) {
         op->right = literal(tokenPointer);
 
         node = op;
+        token = getToken(tokenPointer);
     }
 
     return node;
 }
 
 void* term(void* node, Token*** tokenPointer) {
-    printf("term: %d\n", (**tokenPointer)->tokenType);
-    
     node = exponent(node, tokenPointer);
+    Token* token = getToken(tokenPointer);
 
-    while((**tokenPointer)->tokenType = MULTIPLY || (**tokenPointer)->tokenType == DIVIDE) {
-        Token* token = eat(tokenPointer);
+    while(token->tokenType == MULTIPLY || token->tokenType == DIVIDE) {
+        eat(tokenPointer);
         Op* op = (Op*)malloc(sizeof(Op));
 
         op->optype = TERM;
@@ -80,18 +108,18 @@ void* term(void* node, Token*** tokenPointer) {
         op->right = exponent(node, tokenPointer);
 
         node = op;
+        token = getToken(tokenPointer);
     }
 
     return node;
 }
 
 void* expr(void* node, Token*** tokenPointer) {
-    printf("expr: %d\n", (**tokenPointer)->tokenType);
-    
     node = term(node, tokenPointer);
+    Token* token = getToken(tokenPointer);
 
-    while((**tokenPointer)->tokenType == PLUS || (**tokenPointer)->tokenType == MINUS) {
-        Token* token = eat(tokenPointer);
+    while(token->tokenType == PLUS || token->tokenType == MINUS) {
+        eat(tokenPointer);
         Op* op = (Op*)malloc(sizeof(Op));
 
         op->optype = EXPR;
@@ -100,6 +128,7 @@ void* expr(void* node, Token*** tokenPointer) {
         op->right = term(node, tokenPointer);
 
         node = op;
+        token = getToken(tokenPointer);
     }
 
     return node;
@@ -128,19 +157,19 @@ void* solve(void* node) {
     int result;
 
     switch (opNode->op) {
-        case '+':
+        case PLUS:
             result = lvalue + rvalue;
             break;
-        case '-':
+        case MINUS:
             result = lvalue - rvalue;
             break;
-        case '*':
+        case MULTIPLY:
             result = lvalue * rvalue;
             break;
-        case '/':
+        case DIVIDE:
             result = lvalue / rvalue;
             break;
-        case '^':
+        case EXPONENT:
             result = pow(lvalue, rvalue);
             break;
     }
@@ -165,24 +194,8 @@ void traverse(void* node) {
     Op* opNode = (Op*)node;
 
     traverse(opNode->left);
-    printf("%c ", opNode->op);
+    // printf("%c ", opNode->op);
+    printTokenType(opNode->op);
+    printf(" ");
     traverse(opNode->right);
 }
-
-// int main() {
-//     char tokens[] = "1+3^2+1";
-//     char *tokenPointer = tokens;
-
-//     void* node = NULL;
-
-//     node = expr(node, &tokenPointer);
-
-//     traverse(node);
-
-//     Literal* solved = (Literal*)solve(node);
-
-//     printf("= %d\n", solved->num);
-
-//     free(solved);
-
-// }
